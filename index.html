@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>AdminLab — Administración en Salud · Bacteriología VIII</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+:root {
+  --navy:#0D2B52; --navy-m:#1A4A7A; --teal:#00B4C8; --teal-dk:#0097AA;
+  --teal-lt:#E0F7FA; --yellow:#FFD166; --yellow-dk:#F5A623;
+  --green:#27AE60; --green-lt:#E8F8F0;
+  --purple:#6C3483; --purple-lt:#F0E6FA;
+  --rose:#E74C3C; --rose-lt:#FDECEA;
+  --amber:#F39C12; --amber-lt:#FEF9E7;
+  --white:#fff; --gray:#F4F8FA; --dark:#1a2e3b; --muted:#7F8C8D;
+  --xp-color:#FFD166;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Poppins',sans-serif;background:var(--gray);color:var(--dark);min-height:100vh;}
+
+/* ── TOPBAR ── */
+.topbar{background:linear-gradient(135deg,var(--navy),var(--navy-m));padding:0 24px;height:60px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:3px solid var(--teal);position:sticky;top:0;z-index:200;}
+.topbar .logo{color:#fff;font-size:18px;font-weight:800;display:flex;align-items:center;gap:8px;}
+.topbar .logo span{color:var(--teal);}
+.topbar .xp-bar{display:flex;align-items:center;gap:10px;}
+.xp-badge{background:var(--yellow);color:var(--navy);font-weight:800;font-size:13px;
+  padding:4px 14px;border-radius:20px;display:flex;align-items:center;gap:5px;}
+.prog-wrap{background:rgba(255,255,255,0.2);border-radius:20px;height:8px;width:160px;overflow:hidden;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--teal),#4DD9EC);
+  border-radius:20px;transition:width .5s ease;width:0%;}
+.prog-lbl{color:rgba(255,255,255,.7);font-size:11px;}
+
+/* ── HERO ── */
+.hero{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-m) 60%,var(--teal-dk) 100%);
+  padding:40px 40px 36px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-80px;right:-80px;
+  width:320px;height:320px;border-radius:50%;background:rgba(0,180,200,.1);}
+.hero::after{content:'';position:absolute;bottom:-60px;left:-40px;
+  width:220px;height:220px;border-radius:50%;background:rgba(255,209,102,.08);}
+.hero-tag{display:inline-block;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);
+  color:#fff;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  padding:4px 14px;border-radius:4px;margin-bottom:12px;}
+.hero h1{font-size:36px;font-weight:900;color:#fff;line-height:1.1;margin-bottom:6px;}
+.hero h1 span{color:var(--yellow);}
+.hero p{font-size:14px;color:rgba(255,255,255,.8);max-width:600px;margin-bottom:20px;}
+.hero-stats{display:flex;gap:20px;flex-wrap:wrap;}
+.hero-stat{background:rgba(255,255,255,.12);border-radius:10px;padding:10px 18px;text-align:center;}
+.hero-stat .n{font-size:22px;font-weight:800;color:var(--yellow);}
+.hero-stat .l{font-size:11px;color:rgba(255,255,255,.7);}
+
+/* ── NAV MÓDULOS ── */
+.mod-nav{display:flex;gap:8px;padding:20px 32px 0;flex-wrap:wrap;background:var(--white);
+  border-bottom:2px solid var(--teal-lt);}
+.mod-btn{background:none;border:none;cursor:pointer;font-family:'Poppins',sans-serif;
+  font-size:13px;font-weight:600;color:var(--muted);padding:10px 18px;
+  border-radius:10px 10px 0 0;transition:all .2s;border-bottom:3px solid transparent;margin-bottom:-2px;}
+.mod-btn:hover{color:var(--teal);background:var(--teal-lt);}
+.mod-btn.active{color:var(--navy);border-bottom-color:var(--teal);background:var(--white);}
+.mod-btn.locked{opacity:.45;cursor:not-allowed;}
+.mod-btn .ico{font-size:15px;margin-right:5px;}
+.mod-btn .badge-done{background:var(--green);color:#fff;font-size:9px;font-weight:700;
+  padding:1px 7px;border-radius:8px;margin-left:6px;}
+
+/* ── MAIN ── */
+.main{max-width:960px;margin:0 auto;padding:28px 24px 60px;}
+.mod-panel{display:none;animation:fadeIn .3s ease;}
+.mod-panel.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── SECCIÓN TEORÍA ── */
+.section-block{background:var(--white);border-radius:16px;padding:24px 28px;
+  margin-bottom:20px;box-shadow:0 2px 12px rgba(0,100,120,.08);}
+.section-block h2{font-size:17px;font-weight:800;color:var(--navy);margin-bottom:14px;
+  display:flex;align-items:center;gap:8px;}
+.section-block p,.section-block li{font-size:13.5px;line-height:1.8;color:var(--dark);}
+.section-block ul{padding-left:20px;margin-top:8px;}
+.section-block li{margin-bottom:5px;}
+
+/* ── CONCEPTO CARDS ── */
+.concept-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:14px;}
+.concept-card{border-radius:12px;padding:16px 18px;border-left:4px solid var(--teal);}
+.concept-card h4{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:6px;}
+.concept-card p{font-size:12px;color:var(--dark);line-height:1.6;}
+
+/* ── VIDEO EMBED ── */
+.video-wrap{background:var(--white);border-radius:14px;padding:18px;
+  margin-bottom:16px;box-shadow:0 2px 10px rgba(0,100,120,.08);}
+.video-wrap h3{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:10px;}
+.video-frame{width:100%;height:0;padding-bottom:56.25%;position:relative;border-radius:10px;overflow:hidden;}
+.video-frame iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;}
+.video-meta{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}
+.vtag{font-size:10px;font-weight:700;padding:3px 10px;border-radius:10px;
+  background:var(--teal-lt);color:var(--teal-dk);}
+
+/* ── REFERENCIA ── */
+.ref-box{background:var(--teal-lt);border-left:4px solid var(--teal);border-radius:0 10px 10px 0;
+  padding:12px 16px;margin:12px 0;font-size:12.5px;color:var(--dark);}
+.ref-box strong{color:var(--teal-dk);}
+.ref-box a{color:var(--teal-dk);font-weight:600;}
+
+/* ── RETO / QUIZ ── */
+.reto-container{background:linear-gradient(135deg,var(--navy),var(--navy-m));
+  border-radius:16px;padding:24px;margin-bottom:20px;position:relative;overflow:hidden;}
+.reto-container::before{content:'';position:absolute;top:-40px;right:-40px;
+  width:180px;height:180px;border-radius:50%;background:rgba(0,180,200,.12);}
+.reto-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.reto-title{color:#fff;font-size:16px;font-weight:800;}
+.reto-xp{background:var(--yellow);color:var(--navy);font-weight:800;font-size:12px;
+  padding:4px 14px;border-radius:20px;}
+.caso-box{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);
+  border-radius:12px;padding:16px 18px;margin-bottom:16px;}
+.caso-box .caso-lbl{font-size:10px;font-weight:700;color:var(--teal);letter-spacing:1.5px;
+  text-transform:uppercase;margin-bottom:6px;}
+.caso-box p{font-size:13px;color:#fff;line-height:1.7;}
+.timer-bar{background:rgba(255,255,255,.15);border-radius:20px;height:6px;margin-bottom:16px;overflow:hidden;}
+.timer-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--green),var(--teal));
+  transition:width 1s linear;}
+.timer-lbl{font-size:11px;color:rgba(255,255,255,.6);margin-bottom:8px;text-align:right;}
+.question-block{margin-bottom:20px;}
+.q-num{display:inline-block;background:var(--teal);color:#fff;font-size:10px;font-weight:700;
+  padding:3px 12px;border-radius:10px;margin-bottom:8px;}
+.q-text{font-size:13.5px;font-weight:600;color:#fff;margin-bottom:12px;}
+.options{display:flex;flex-direction:column;gap:8px;}
+.opt{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.1);
+  border:2px solid transparent;border-radius:10px;padding:11px 14px;cursor:pointer;
+  transition:all .2s;font-size:13px;color:#fff;}
+.opt:hover{border-color:var(--teal);background:rgba(0,180,200,.2);}
+.opt.correct{border-color:var(--green);background:rgba(39,174,96,.25);font-weight:700;}
+.opt.wrong{border-color:var(--rose);background:rgba(231,76,60,.2);}
+.opt input{accent-color:var(--teal);width:15px;height:15px;flex-shrink:0;}
+.fb{display:none;padding:10px 14px;border-radius:8px;font-size:12.5px;font-weight:600;margin-top:6px;}
+.fb.show{display:block;}
+.fb.correct{background:rgba(39,174,96,.2);color:#81E6A3;border:1px solid var(--green);}
+.fb.wrong{background:rgba(231,76,60,.2);color:#FFB3AE;border:1px solid var(--rose);}
+.reto-submit{background:var(--teal);color:#fff;font-family:'Poppins',sans-serif;
+  font-size:14px;font-weight:700;padding:12px 36px;border:none;border-radius:50px;
+  cursor:pointer;margin-top:10px;transition:all .2s;display:block;}
+.reto-submit:hover{background:var(--teal-dk);transform:translateY(-1px);}
+.reto-result{display:none;background:rgba(255,255,255,.08);border-radius:14px;
+  padding:20px;text-align:center;margin-top:16px;}
+.reto-result.show{display:block;}
+.reto-result .big-score{font-size:52px;font-weight:900;color:var(--yellow);}
+.reto-result p{color:rgba(255,255,255,.8);font-size:13px;margin-top:6px;}
+.reto-result .xp-earned{background:var(--green);color:#fff;font-weight:700;font-size:13px;
+  padding:6px 20px;border-radius:20px;display:inline-block;margin-top:10px;}
+
+/* ── INSIGNIA ── */
+.insignia-card{background:var(--white);border-radius:16px;padding:20px;text-align:center;
+  box-shadow:0 4px 16px rgba(0,100,120,.12);border-top:4px solid var(--yellow);}
+.insignia-icon{font-size:52px;margin-bottom:10px;}
+.insignia-card h3{font-size:14px;font-weight:800;color:var(--navy);margin-bottom:4px;}
+.insignia-card p{font-size:12px;color:var(--muted);}
+.insignia-locked{filter:grayscale(1);opacity:.4;}
+.insignias-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:16px;}
+
+/* ── LOGROS ── */
+.logros-panel{background:var(--navy);border-radius:16px;padding:28px;color:#fff;}
+.logros-panel h2{font-size:18px;font-weight:800;color:var(--yellow);margin-bottom:20px;}
+.logro-row{display:flex;align-items:center;gap:14px;padding:12px 0;
+  border-bottom:1px solid rgba(255,255,255,.1);}
+.logro-ico{font-size:28px;flex-shrink:0;}
+.logro-info h4{font-size:13px;font-weight:700;color:#fff;margin-bottom:2px;}
+.logro-info p{font-size:11.5px;color:rgba(255,255,255,.6);}
+.logro-pts{background:var(--yellow);color:var(--navy);font-weight:800;font-size:12px;
+  padding:4px 12px;border-radius:20px;margin-left:auto;white-space:nowrap;}
+.logro-row.locked .logro-ico{filter:grayscale(1);}
+.logro-row.locked .logro-info h4{color:rgba(255,255,255,.3);}
+.logro-row.locked .logro-pts{background:rgba(255,255,255,.15);color:rgba(255,255,255,.3);}
+
+/* ── COMPLETE BTN ── */
+.complete-section{text-align:center;padding:28px 0 10px;border-top:2px solid var(--teal-lt);margin-top:28px;}
+.complete-btn{background:linear-gradient(135deg,var(--teal),var(--teal-dk));color:#fff;
+  font-family:'Poppins',sans-serif;font-size:14px;font-weight:800;padding:14px 44px;
+  border:none;border-radius:50px;cursor:pointer;
+  box-shadow:0 8px 24px rgba(0,180,200,.35);transition:all .2s;}
+.complete-btn:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,180,200,.5);}
+.complete-btn:disabled{background:#a0b0b8;cursor:not-allowed;box-shadow:none;transform:none;}
+
+/* ── NOTIFICATION ── */
+.notif{position:fixed;top:72px;right:20px;background:var(--navy);color:#fff;
+  border-left:4px solid var(--yellow);border-radius:10px;padding:14px 20px;
+  font-size:13px;font-weight:600;z-index:999;transform:translateX(200%);
+  transition:transform .4s ease;max-width:300px;box-shadow:0 8px 24px rgba(0,0,0,.3);}
+.notif.show{transform:translateX(0);}
+.notif .n-ico{font-size:20px;margin-right:8px;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:640px){
+  .hero h1{font-size:26px;} .main{padding:16px 12px 40px;}
+  .hero{padding:24px 20px;} .mod-nav{padding:12px 16px 0;}
+  .hero-stats{gap:10px;}
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">🔬 <span>Admin</span>Lab</div>
+  <div class="xp-bar">
+    <div class="prog-lbl" id="prog-lbl">0 / 4 módulos</div>
+    <div class="prog-wrap"><div class="prog-fill" id="prog-fill"></div></div>
+    <div class="xp-badge">⭐ <span id="xp-total">0</span> XP</div>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">✦ ADMINISTRACIÓN EN SALUD · VIII SEMESTRE · BACTERIOLOGÍA</div>
+  <h1>Proceso <span>Administrativo</span><br>en Salud</h1>
+  <p>Domina las 4 etapas del proceso administrativo aplicadas a laboratorios clínicos, instituciones de salud y gestión de calidad. Completa retos, gana XP e insignias.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="n">4</div><div class="l">Módulos</div></div>
+    <div class="hero-stat"><div class="n">16</div><div class="l">Retos</div></div>
+    <div class="hero-stat"><div class="n">800</div><div class="l">XP totales</div></div>
+    <div class="hero-stat"><div class="n">4</div><div class="l">Insignias</div></div>
+  </div>
+</div>
+
+<!-- NAV MÓDULOS -->
+<div class="mod-nav">
+  <button class="mod-btn active" data-mod="m1" onclick="switchMod('m1',this)">
+    <span class="ico">🗺️</span>Módulo 1 — Planear
+  </button>
+  <button class="mod-btn locked" data-mod="m2" id="btn-m2" onclick="tryMod('m2',this)">
+    <span class="ico">🏗️</span>Módulo 2 — Organizar
+  </button>
+  <button class="mod-btn locked" data-mod="m3" id="btn-m3" onclick="tryMod('m3',this)">
+    <span class="ico">🎯</span>Módulo 3 — Dirigir
+  </button>
+  <button class="mod-btn locked" data-mod="m4" id="btn-m4" onclick="tryMod('m4',this)">
+    <span class="ico">📊</span>Módulo 4 — Controlar
+  </button>
+  <button class="mod-btn" data-mod="logros" onclick="switchMod('logros',this)">
+    <span class="ico">🏆</span>Mis Logros
+  </button>
+</div>
+
+<div class="main">
+
+<div id="video-config-panel" style="background:#1B2A4A;border-left:4px solid #FFD166;
+  border-radius:10px;padding:16px 20px;margin-bottom:20px;font-size:13px;">
+  <div style="color:#FFD166;font-weight:800;margin-bottom:8px;">
+    ⚙️ Panel de Videos — AdminLab
+  </div>
+  <div style="color:rgba(255,255,255,.8);margin-bottom:10px;">
+    Si algún video no carga, abre YouTube, busca el tema, copia el ID del video 
+    (el código después de <code style="background:#0D2B52;padding:2px 6px;border-radius:4px;color:#4DD9EC;">?v=</code>) 
+    y reemplázalo en el código fuente en la sección <strong>CONFIGURACIÓN DE VIDEOS</strong>.
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:8px;">
+    <a href="https://www.youtube.com/results?search_query=planeacion+estrategica+salud+español" target="_blank"
+       style="background:#0097AA;color:#fff;font-size:11px;font-weight:700;padding:4px 12px;
+       border-radius:20px;text-decoration:none;">🔍 M1V1 Planeación</a>
+    <a href="https://www.youtube.com/results?search_query=matriz+dofa+salud+hospital+español" target="_blank"
+       style="background:#0097AA;color:#fff;font-size:11px;font-weight:700;padding:4px 12px;
+       border-radius:20px;text-decoration:none;">🔍 M1V2 DOFA</a>
+    <a href="https://www.youtube.com/results?search_query=estructura+organizacional+instituciones+salud" target="_blank"
+       style="background:#27AE60;color:#fff;font-size:11px;font-weight:700;padding:4px 12px;
+       border-radius:20px;text-decoration:none;">🔍 M2V1 Organización</a>
+    <a href="https://www.youtube.com/results?search_query=ISO+15189+laboratorio+clinico+español" target="_blank"
+       style="background:#27AE60;color:#fff;font-size:11px;font-weight:700;padding:4px 12px;
+       border-radius:20px;text-decoration:none;">🔍 M2V2 ISO 15189</a>
+    <a href="https://www.youtube.com/results?search_query=liderazgo+transformacional+salud+español" target="_blank"
+       style="background:#6C3483;color:#fff;font-size:11px;font-weight:700;padding:4px 12px;
+       border-radius:20px;text-decoration:none;">🔍 M3V1 Liderazgo</a>
+    <a href="https://www.youtube.com/results?search_query=toma+decisiones+administracion+salud" target="_blank"
+       style="background:#6C3483;color:#fff;font-size:11px;font-weight:700;padding:4px 12px;
+       border-radius:20px;text-decoration:none;">🔍 M3V2 Decisiones</a>
+    <a href="https://www.youtube.com/results?search_query=control+calidad+laboratorio+clinico+westgard" target="_blank"
+       style="background:#F39C12;color:#fff;font-size:11px;font-weight:700;padding:4px 12px;
+       border-radius:20px;text-decoration:none;">🔍 M4V1 Westgard</a>
+    <a href="https://www.youtube.com/results?search_query=auditoria+interna+ISO+laboratorio+mejora+continua" target="_blank"
+       style="background:#F39C12;color:#fff;font-size:11px;font-weight:700;padding:4px 12px;
+       border-radius:20px;text-decoration:none;">🔍 M4V2 Auditoría</a>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     MÓDULO 1 — PLANEAR
+═══════════════════════════════════════════════════════════════ -->
+<div id="m1" class="mod-panel active">
+
+  <div class="section-block">
+    <h2>🗺️ Módulo 1 — Planeación en Salud</h2>
+    <p>La <strong>planeación</strong> es la primera y más estratégica etapa del proceso administrativo. En el contexto del laboratorio clínico y las instituciones de salud, planear significa anticipar el futuro, definir objetivos medibles y trazar rutas de acción alineadas con la normatividad vigente.</p>
+    <div class="ref-box">
+      <strong>📚 Referencia clave:</strong> Organización Panamericana de la Salud (OPS/OMS). <em>Gestión de los servicios de salud.</em> Washington D.C.: OPS, 2020. Disponible en: <a href="https://www.paho.org" target="_blank">paho.org</a>
+    </div>
+  </div>
+
+  <div class="section-block">
+    <h2>📖 Conceptos fundamentales</h2>
+    <p>La planeación en salud opera en tres niveles que el bacteriólogo debe conocer al asumir roles administrativos:</p>
+    <div class="concept-grid">
+      <div class="concept-card" style="background:#EAF6FF;border-color:#0097AA;">
+        <h4>🔭 Planeación Estratégica</h4>
+        <p>Largo plazo (3-5 años). Define la misión, visión y objetivos institucionales. Ejemplo: Plan de Desarrollo Institucional de una IPS.</p>
+      </div>
+      <div class="concept-card" style="background:#E8F8F0;border-color:#27AE60;">
+        <h4>⚙️ Planeación Táctica</h4>
+        <p>Mediano plazo (1-2 años). Planes por departamentos. Ejemplo: Plan Operativo Anual del laboratorio clínico.</p>
+      </div>
+      <div class="concept-card" style="background:#FEF9E7;border-color:#F39C12;">
+        <h4>📋 Planeación Operativa</h4>
+        <p>Corto plazo (semanas/meses). Actividades concretas. Ejemplo: cronograma de mantenimiento de equipos, rotación de turnos.</p>
+      </div>
+      <div class="concept-card" style="background:#F0E6FA;border-color:#6C3483;">
+        <h4>📐 Herramientas clave</h4>
+        <p>Matriz DOFA, árbol de problemas, Marco Lógico, indicadores SMART, diagrama de Gantt, PESTEL.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-block">
+    <h2>📋 Planeación en el Laboratorio Clínico — Normativa</h2>
+    <ul>
+      <li><strong>Resolución 3100 de 2019 (MinSalud):</strong> Define los procedimientos y condiciones de inscripción de los prestadores de servicios de salud, incluyendo laboratorios clínicos.</li>
+      <li><strong>Decreto 1011 de 2006:</strong> Sistema Obligatorio de Garantía de Calidad (SOGCS) — base de la planeación de calidad en salud.</li>
+      <li><strong>NTC-ISO 15189:2022:</strong> Norma internacional para laboratorios médicos — requisitos para la calidad y la competencia. Base para la planeación técnica.</li>
+      <li><strong>Plan Decenal de Salud Pública 2022-2031 (MinSalud Colombia):</strong> Marco de planeación estratégica nacional que orienta los planes institucionales.</li>
+    </ul>
+    <div class="ref-box">
+      <strong>📌 Fuente:</strong> Ministerio de Salud y Protección Social. <em>Resolución 3100 de 2019.</em>
+      Disponible en: <a href="https://www.minsalud.gov.co" target="_blank">minsalud.gov.co</a>
+    </div>
+  </div>
+
+  <div class="video-wrap">
+    <h3>🎬 Video 1 — Proceso de planeación estratégica en salud</h3>
+    <div class="video-frame">
+      <iframe id="vid-m1v1" src="about:blank" allowfullscreen title="Planeación estratégica en salud"></iframe>
+    </div>
+    <div class="video-meta">
+      <span class="vtag">Planeación estratégica</span>
+      <span class="vtag">Gestión en salud</span>
+      <span class="vtag">~10 min</span>
+    </div>
+  </div>
+
+  <div class="video-wrap">
+    <h3>🎬 Video 2 — Matriz DOFA aplicada a instituciones de salud</h3>
+    <div class="video-frame">
+      <iframe id="vid-m1v2" src="about:blank" allowfullscreen title="Matriz DOFA en salud"></iframe>
+    </div>
+    <div class="video-meta">
+      <span class="vtag">Matriz DOFA</span>
+      <span class="vtag">Análisis estratégico</span>
+      <span class="vtag">~8 min</span>
+    </div>
+  </div>
+
+  <!-- RETO 1 -->
+  <div class="reto-container">
+    <div class="reto-header">
+      <div class="reto-title">⚔️ RETO 1 — Planeación Estratégica del Laboratorio</div>
+      <div class="reto-xp">+50 XP</div>
+    </div>
+    <div class="caso-box">
+      <div class="caso-lbl">📋 Caso clínico-administrativo</div>
+      <p>El laboratorio clínico del Hospital Regional de Cundinamarca presenta un incremento del 35% en el tiempo de entrega de resultados durante los últimos 6 meses. El bacteriólogo jefe debe liderar la planeación para resolver esta problemática. El presupuesto disponible es limitado y hay resistencia del personal al cambio.</p>
+    </div>
+    <div class="timer-lbl" id="t1-lbl">⏱️ Tiempo: 120 seg</div>
+    <div class="timer-bar"><div class="timer-fill" id="t1-fill" style="width:100%"></div></div>
+    <div id="quiz-m1">
+      <div class="question-block">
+        <div class="q-num">Pregunta 1 de 4</div>
+        <div class="q-text">¿Cuál es la herramienta más adecuada para iniciar el diagnóstico situacional del laboratorio en este caso?</div>
+        <div class="options">
+          <label class="opt" id="m1q1o0" onclick="selectOpt('m1',1,0,1)"><input type="radio" name="m1q1"> Diagrama de Gantt para reorganizar turnos</label>
+          <label class="opt" id="m1q1o1" onclick="selectOpt('m1',1,1,1)"><input type="radio" name="m1q1"> Matriz DOFA para identificar fortalezas, debilidades, oportunidades y amenazas del laboratorio</label>
+          <label class="opt" id="m1q1o2" onclick="selectOpt('m1',1,2,1)"><input type="radio" name="m1q1"> Lista de verificación de equipos dañados</label>
+          <label class="opt" id="m1q1o3" onclick="selectOpt('m1',1,3,1)"><input type="radio" name="m1q1"> Encuesta de satisfacción al personal</label>
+        </div>
+        <div class="fb" id="m1q1fb"></div>
+      </div>
+      <div class="question-block">
+        <div class="q-num">Pregunta 2 de 4</div>
+        <div class="q-text">Según la Norma ISO 15189, ¿qué debe contemplar obligatoriamente la planeación de calidad de un laboratorio médico?</div>
+        <div class="options">
+          <label class="opt" id="m1q2o0" onclick="selectOpt('m1',2,0,2)"><input type="radio" name="m1q2"> Solo los procedimientos técnicos de análisis</label>
+          <label class="opt" id="m1q2o1" onclick="selectOpt('m1',2,1,2)"><input type="radio" name="m1q2"> Gestión de riesgos, recursos, competencias del personal, mejora continua e indicadores de calidad</label>
+          <label class="opt" id="m1q2o2" onclick="selectOpt('m1',2,2,2)"><input type="radio" name="m1q2"> Únicamente el presupuesto anual de insumos</label>
+          <label class="opt" id="m1q2o3" onclick="selectOpt('m1',2,3,2)"><input type="radio" name="m1q2"> El horario de atención al público</label>
+        </div>
+        <div class="fb" id="m1q2fb"></div>
+      </div>
+      <div class="question-block">
+        <div class="q-num">Pregunta 3 de 4</div>
+        <div class="q-text">Un objetivo SMART para abordar el problema del laboratorio sería:</div>
+        <div class="options">
+          <label class="opt" id="m1q3o0" onclick="selectOpt('m1',3,0,1)"><input type="radio" name="m1q3"> "Mejorar los procesos del laboratorio lo antes posible"</label>
+          <label class="opt" id="m1q3o1" onclick="selectOpt('m1',3,1,1)"><input type="radio" name="m1q3"> "Reducir el tiempo de entrega de resultados de hemograma en un 30%, pasando de 4 a 2.8 horas promedio, durante los próximos 3 meses"</label>
+          <label class="opt" id="m1q3o2" onclick="selectOpt('m1',3,2,1)"><input type="radio" name="m1q3"> "Capacitar a todo el personal en algún momento del año"</label>
+          <label class="opt" id="m1q3o3" onclick="selectOpt('m1',3,3,1)"><input type="radio" name="m1q3"> "Comprar equipos nuevos si el presupuesto lo permite"</label>
+        </div>
+        <div class="fb" id="m1q3fb"></div>
+      </div>
+      <div class="question-block">
+        <div class="q-num">Pregunta 4 de 4</div>
+        <div class="q-text">¿En qué nivel de planeación se enmarca el Plan Operativo Anual (POA) del laboratorio clínico?</div>
+        <div class="options">
+          <label class="opt" id="m1q4o0" onclick="selectOpt('m1',4,0,0)"><input type="radio" name="m1q4"> Planeación estratégica</label>
+          <label class="opt" id="m1q4o1" onclick="selectOpt('m1',4,1,0)"><input type="radio" name="m1q4"> Planeación táctica</label>
+          <label class="opt" id="m1q4o2" onclick="selectOpt('m1',4,2,0)"><input type="radio" name="m1q4"> Planeación operativa</label>
+          <label class="opt" id="m1q4o3" onclick="selectOpt('m1',4,3,0)"><input type="radio" name="m1q4"> Planeación prospectiva</label>
+        </div>
+        <div class="fb" id="m1q4fb"></div>
+      </div>
+      <button class="reto-submit" onclick="submitReto('m1',4,[1,1,1,2])">✅ Enviar respuestas</button>
+      <div class="reto-result" id="m1-result"></div>
+    </div>
+  </div>
+
+  <!-- RETO 2 -->
+  <div class="reto-container">
+    <div class="reto-header">
+      <div class="reto-title">⚔️ RETO 2 — DOFA y Normativa en Laboratorio</div>
+      <div class="reto-xp">+50 XP</div>
+    </div>
+    <div class="caso-box">
+      <div class="caso-lbl">📋 Caso clínico-administrativo</div>
+      <p>Una IPS de mediana complejidad en Bogotá requiere acreditarse en calidad ante el ICONTEC. El bacteriólogo coordinador del laboratorio debe construir la planeación del Sistema de Gestión de Calidad basado en los requisitos del SOGCS (Decreto 1011/2006) y la NTC-ISO 15189.</p>
+    </div>
+    <div class="timer-lbl" id="t2-lbl">⏱️ Tiempo: 120 seg</div>
+    <div class="timer-bar"><div class="timer-fill" id="t2-fill" style="width:100%"></div></div>
+    <div id="quiz-m1b">
+      <div class="question-block">
+        <div class="q-num">Pregunta 1 de 4</div>
+        <div class="q-text">¿Cuál es el primer paso para construir el SGC del laboratorio según el ciclo PHVA?</div>
+        <div class="options">
+          <label class="opt" id="m1bq1o0" onclick="selectOpt('m1b',1,0,0)"><input type="radio" name="m1bq1"> Hacer (ejecutar los procedimientos)</label>
+          <label class="opt" id="m1bq1o1" onclick="selectOpt('m1b',1,1,0)"><input type="radio" name="m1bq1"> Verificar (auditar procesos)</label>
+          <label class="opt" id="m1bq1o2" onclick="selectOpt('m1b',1,2,0)"><input type="radio" name="m1bq1"> Planear (definir política, objetivos, procesos y recursos)</label>
+          <label class="opt" id="m1bq1o3" onclick="selectOpt('m1b',1,3,0)"><input type="radio" name="m1bq1"> Actuar (implementar mejoras)</label>
+        </div>
+        <div class="fb" id="m1bq1fb"></div>
+      </div>
+      <div class="question-block">
+        <div class="q-num">Pregunta 2 de 4</div>
+        <div class="q-text">El Decreto 1011 de 2006 establece el SOGCS. ¿Cuál de sus componentes corresponde a la habilitación del laboratorio?</div>
+        <div class="options">
+          <label class="opt" id="m1bq2o0" onclick="selectOpt('m1b',2,0,1)"><input type="radio" name="m1bq2"> Sistema de Acreditación en Salud</label>
+          <label class="opt" id="m1bq2o1" onclick="selectOpt('m1b',2,1,1)"><input type="radio" name="m1bq2"> Sistema Único de Habilitación (SUH)</label>
+          <label class="opt" id="m1bq2o2" onclick="selectOpt('m1b',2,2,1)"><input type="radio" name="m1bq2"> Sistema de Información para la Calidad</label>
+          <label class="opt" id="m1bq2o3" onclick="selectOpt('m1b',2,3,1)"><input type="radio" name="m1bq2"> Auditoría para el Mejoramiento de la Calidad (PAMEC)</label>
+        </div>
+        <div class="fb" id="m1bq2fb"></div>
+      </div>
+      <div class="question-block">
+        <div class="q-num">Pregunta 3 de 4</div>
+        <div class="q-text">En la planeación de recursos del laboratorio, ¿cuál de los siguientes NO es un requisito de la NTC-ISO 15189?</div>
+        <div class="options">
+          <label class="opt" id="m1bq3o0" onclick="selectOpt('m1b',3,0,3)"><input type="radio" name="m1bq3"> Competencia del personal técnico y científico</label>
+          <label class="opt" id="m1bq3o1" onclick="selectOpt('m1b',3,1,3)"><input type="radio" name="m1bq3"> Gestión del equipamiento e infraestructura</label>
+          <label class="opt" id="m1bq3o2" onclick="selectOpt('m1b',3,2,3)"><input type="radio" name="m1bq3"> Control de proveedores y servicios externos</label>
+          <label class="opt" id="m1bq3o3" onclick="selectOpt('m1b',3,3,3)"><input type="radio" name="m1bq3"> Diseño del uniforme del personal de laboratorio</label>
+        </div>
+        <div class="fb" id="m1bq3fb"></div>
+      </div>
+      <div class="question-block">
+        <div class="q-num">Pregunta 4 de 4</div>
+        <div class="q-text">Una fortaleza identificada en la DOFA del laboratorio es: "Personal con formación en biología molecular". ¿Cómo debe reflejarse esto en la planeación estratégica?</div>
+        <div class="options">
+          <label class="opt" id="m1bq4o0" onclick="selectOpt('m1b',4,0,1)"><input type="radio" name="m1bq4"> Ignorarla ya que solo importan las debilidades</label>
+          <label class="opt" id="m1bq4o1" onclick="selectOpt('m1b',4,1,1)"><input type="radio" name="m1bq4"> Incorporarla como ventaja competitiva para desarrollar nuevos servicios o líneas de investigación</label>
+          <label class="opt" id="m1bq4o2" onclick="selectOpt('m1b',4,2,1)"><input type="radio" name="m1bq4"> Mantenerla en reserva para no generar expectativas</label>
+          <label class="opt" id="m1bq4o3" onclick="selectOpt('m1b',4,3,1)"><input type="radio" name="m1bq4"> Documentarla como amenaza externa</label>
+        </div>
+        <div class="fb" id="m1bq4fb"></div>
+      </div>
+      <button class="reto-submit" onclick="submitReto('m1b',4,[0,1,3,1])">✅ Enviar respuestas</button>
+      <div class="reto-result" id="m1b-result"></div>
+    </div>
+  </div>
+
+  <div class="complete-section">
+    <button class="complete-btn" id="btn-complete-m1" onclick="completeModule('m1','🗺️','Planificador Estratégico',50)">
+      ✅ Completar Módulo 1 — Planear
+    </button>
+    <p style="font-size:12px;color:var(--muted);margin-top:8px;">Completa ambos retos antes de avanzar</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     MÓDULO 2 — ORGANIZAR
+═══════════════════════════════════════════════════════════════ -->
+<div id="m2" class="mod-panel">
+  <div class="section-block">
+    <h2>🏗️ Módulo 2 — Organización en Salud</h2>
+    <p>La <strong>organización</strong> es la etapa del proceso administrativo que define cómo se estructuran los recursos humanos, físicos y financieros para alcanzar los objetivos planeados. En el laboratorio clínico, organizar implica diseñar estructuras, asignar roles y coordinar procesos bajo marcos normativos específicos.</p>
+    <div class="ref-box">
+      <strong>📚 Referencia:</strong> Chiavenato, I. <em>Introducción a la Teoría General de la Administración</em> (10.ª ed.). McGraw-Hill, 2019. | MinSalud. <em>Manual de Habilitación para Laboratorios Clínicos.</em> Bogotá: MSPS, 2021.
+    </div>
+  </div>
+
+  <div class="section-block">
+    <h2>📖 Conceptos fundamentales</h2>
+    <div class="concept-grid">
+      <div class="concept-card" style="background:#EAF6FF;border-color:#0097AA;">
+        <h4>🏛️ Estructura Organizacional</h4>
+        <p>Organigrama que define jerarquías, líneas de autoridad y dependencias. En el laboratorio: director técnico, coordinador, bacteriólogos, auxiliares.</p>
+      </div>
+      <div class="concept-card" style="background:#E8F8F0;border-color:#27AE60;">
+        <h4>📄 Manual de Funciones</h4>
+        <p>Documento que describe las responsabilidades, requisitos y competencias de cada cargo. Requisito del SOGCS para la habilitación.</p>
+      </div>
+      <div class="concept-card" style="background:#FEF9E7;border-color:#F39C12;">
+        <h4>🔄 Mapa de Procesos</h4>
+        <p>Representación visual de los procesos estratégicos, misionales y de apoyo. Base del SGC del laboratorio (ISO 15189).</p>
+      </div>
+      <div class="concept-card" style="background:#F0E6FA;border-color:#6C3483;">
+        <h4>👥 Gestión del Talento</h4>
+        <p>Selección, inducción, capacitación y evaluación del personal. El bacteriólogo administrador debe garantizar competencias certificadas.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-block">
+    <h2>⚗️ Organización del Laboratorio Clínico — Áreas clave</h2>
+    <ul>
+      <li><strong>Área preanalítica:</strong> Recepción, toma y transporte de muestras. Procesos: identificación del paciente, verificación de órdenes, condiciones de toma.</li>
+      <li><strong>Área analítica:</strong> Procesamiento y análisis de muestras. Procesos: calibración de equipos, control de calidad interno/externo, validación de resultados.</li>
+      <li><strong>Área postanalítica:</strong> Emisión, entrega e interpretación de resultados. Procesos: verificación de valores críticos, comunicación con el médico tratante.</li>
+      <li><strong>Área administrativa:</strong> Gestión de recursos, talento humano, proveedores, sistemas de información (RIPS, HIS).</li>
+    </ul>
+    <div class="ref-box">
+      <strong>📌 Fuente:</strong> Instituto Nacional de Salud (INS). <em>Manual de gestión de la calidad para laboratorios de salud pública.</em> Bogotá: INS, 2021. Disponible en: <a href="https://www.ins.gov.co" target="_blank">ins.gov.co</a>
+    </div>
+  </div>
+
+  <div class="video-wrap">
+    <h3>🎬 Video 1 — Estructura organizacional en instituciones de salud</h3>
+    <div class="video-frame">
+      <iframe id="vid-m2v1" src="about:blank" allowfullscreen title="Organización en salud"></iframe>
+    </div>
+    <div class="video-meta"><span class="vtag">Organización</span><span class="vtag">Talento humano en salud</span><span class="vtag">~9 min</span></div>
+  </div>
+
+  <div class="video-wrap">
+    <h3>🎬 Video 2 — Mapa de procesos y manual de calidad ISO 15189</h3>
+    <div class="video-frame">
+      <iframe id="vid-m2v2" src="about:blank" allowfullscreen title="ISO 15189 laboratorio"></iframe>
+    </div>
+    <div class="video-meta"><span class="vtag">ISO 15189</span><span class="vtag">Mapa de procesos</span><span class="vtag">~11 min</span></div>
+  </div>
+
+  <!-- RETO 3 -->
+  <div class="reto-container">
+    <div class="reto-header">
+      <div class="reto-title">⚔️ RETO 3 — Estructura del Laboratorio</div>
+      <div class="reto-xp">+50 XP</div>
+    </div>
+    <div class="caso-box">
+      <div class="caso-lbl">📋 Caso clínico-administrativo</div>
+      <p>Un laboratorio de mediana complejidad abre una nueva sede. Debes diseñar la estructura organizacional y el mapa de procesos cumpliendo los estándares del Manual de Habilitación del MinSalud (Resolución 3100/2019) y los requisitos de la NTC-ISO 15189:2022.</p>
+    </div>
+    <div class="timer-lbl" id="t3-lbl">⏱️ Tiempo: 120 seg</div>
+    <div class="timer-bar"><div class="timer-fill" id="t3-fill" style="width:100%"></div></div>
+    <div id="quiz-m2">
+      <div class="question-block">
+        <div class="q-num">Pregunta 1 de 4</div>
+        <div class="q-text">¿Cuál es la diferencia entre un proceso misional y uno de apoyo en el laboratorio clínico?</div>
+        <div class="options">
+          <label class="opt" id="m2q1o0" onclick="selectOpt('m2',1,0,1)"><input type="radio" name="m2q1"> Los misionales son secretos y los de apoyo son públicos</label>
+          <label class="opt" id="m2q1o1" onclick="selectOpt('m2',1,1,1)"><input type="radio" name="m2q1"> Los misionales generan valor directo al paciente (análisis, diagnóstico); los de apoyo sostienen el funcionamiento (TI, mantenimiento, talento humano)</label>
+          <label class="opt" id="m2q1o2" onclick="selectOpt('m2',1,2,1)"><input type="radio" name="m2q1"> No existe diferencia entre ellos en el contexto del laboratorio</label>
+          <label class="opt" id="m2q1o3" onclick="selectOpt('m2',1,3,1)"><input type="radio" name="m2q1"> Los de apoyo son más importantes que los misionales</label>
+        </div>
+        <div class="fb" id="m2q1fb"></div>
+      </div>
+      <div class="question-block">
+        <div class="q-num">Pregunta 2 de 4</div>
+        <div class="q-text">Según la Resolución 3100/2019, ¿quién debe ser el Director Técnico de un laboratorio clínico de mediana complejidad?</div>
+        <div class="options">
+          <label class="opt" id="m2q2o0" onclick="selectOpt('m2',2,0,0)"><input type="radio" name="m2q2"> Un administrador de empresas con especialización en salud</label>
+          <label class="opt" id="m2q2o1" onclick="selectOpt('m2',2,1,0)"><input type="radio" name="m2q2"> Un médico general con experiencia en laboratorio</label>
+          <label class="opt" id="m2q2o2" onclick="selectOpt('m2',2,2,0)"><input type="radio" name="m2q2"> Un Bacteriólogo o profesional de ciencias de la salud con título en el área, según los estándares de habilitación</label>
+          <label class="opt" id="m2q2o3" onclick="selectOpt('m2',2,3,0)"><input type="radio" name="m2q2"> Cualquier profesional de salud con antigüedad mayor a 5 años</label>
+        </div>
+        <div class="fb" id="m2q2fb"></div>
+      </div>
+      <div class="question-block">
+        <div class="q-num">Pregunta 3 de 4</div>
+        <div class="q-text">¿Cuál de las siguientes NO es un área preanalítica del laboratorio?</div>
+        <div class="options">
+          <label class="opt" id="m2q3o0" onclick="selectOpt('m2',3,0,3)"><input type="radio" name="m2q3"> Recepción e identificación del paciente</label>
+          <label class="opt" id="m2q3o1" onclick="selectOpt('m2',3,1,3)"><input type="radio" name="m2q3"> Toma y transporte de muestras</label>
+          <label class="opt" id="m2q3o2" onclick="selectOpt('m2',3,2,3)"><input type="radio" name="m2q3"> Verificación de órdenes médicas</label>
+          <label class="opt" id="m2q3o3" onclick="selectOpt('m2',3,3,3)"><input type="radio" name="m2q3"> Análisis microbiológico de la muestra</label>
+        </div>
+        <div class="fb" id="m2q3fb"></div>
+      </div>
+      <div class="question-block">
+        <div class="q-num">Pregunta 4 de 4</div>
+        <div class="q-text">El principio de "unidad de mando" en la organización del laboratorio implica:</div>
+        <div class="options">
+          <label class="opt" id="m2q4o0" onclick="selectOpt('m2',4,0,1)"><input type="radio" name="m2q4"> Que todos los bacteriólogos deben reportar al mismo tiempo</label>
+          <label class="opt" id="m2q4o1" onclick="selectOpt('m2',4,1,1)"><input type="radio" name="m2q4"> Que cada colaborador recibe instrucciones de un solo superior directo, evitando duplicidad de órdenes y confusión de roles</label>
+          <label class="opt" id="m2q4o2" onclick="selectOpt('m2',4,2,1)"><input type="radio" name="m2q4"> Que solo el director técnico puede hablar con los pacientes</label>
+          <label class="opt" id="m2q4o3" onclick="selectOpt('m2',4,3,1)"><input type="radio" name="m2q4"> Que las decisiones deben tomarse por unanimidad en el equipo</label>
+        </div>
+        <div class="fb" id="m2q4fb"></div>
+      </div>
+      <button class="reto-submit" onclick="submitReto('m2',4,[1,2,3,1])">✅ Enviar respuestas</button>
+      <div class="reto-result" id="m2-result"></div>
+    </div>
+  </div>
+
+  <!-- RETO 4 -->
+  <div class="reto-container">
+    <div class="reto-header">
+      <div class="reto-title">⚔️ RETO 4 — Gestión del Talento Humano</div>
+      <div class="reto-xp">+50 XP</div>
+    </div>
+    <div class="caso-box">
+      <div class="caso-lbl">📋 Caso clínico-administrativo</div>
+      <p>El laboratorio de microbiología clínica de una EPS contrata a 3 nuevos bacteriólogos recién egresados. El coordinador debe diseñar el proceso de inducción, asignación de funciones y evaluación de competencias según los estándares de habilitación y calidad.</p>
+    </div>
+    <div class="timer-lbl" id="t4-lbl">⏱️ Tiempo: 120 seg</div>
+    <div class="timer-bar"><div class="timer-fill" id="t4-fill" style="width:100%"></div></div>
+    <div id="quiz-m2b">
+      <div class="question-block">
+        <div class="q-num">Pregunta 1 de 4</div>
+        <div class="q-text">¿Qué debe incluir obligatoriamente el proceso de inducción del personal en un laboratorio habilitado?</div>
+        <div class="options">
+          <label class="opt" id="m2bq1o0" onclick="selectOpt('m2b',1,0,1)"><input type="radio" name="m2bq1"> Solo una visita guiada a las instalaciones</label>
+          <label class="opt" id="m2bq1o1" onclick="selectOpt('m2b',1,1,1)"><input type="radio" name="m2bq1"> Políticas institucionales, procedimientos del SGC, normas de bioseguridad, funciones del cargo y manejo de equipos</label>
+          <label class="opt" id="m2bq1o2" onclick="selectOpt('m2b',1,2,1)"><input type="radio" name="m2bq1"> Únicamente la firma de contrato y afiliación a seguridad social</label>
+          <label class="opt" id="m2bq1o3" onclick="selectOpt('m2b',1,3,1)"><input type="radio" name="m2bq1"> Solo las técnicas de venipuntura y toma de muestras</label>
+        </div>
+        <div class="fb" id="m2bq1fb"></div>
+      </div>
+      <div class="question-block">
+        <div class="q-num">Pregunta 2 de 4</div>
+        <div class="q-text">¿Cuál es la diferencia entre un perfil de cargo y un manual de funciones?</div>
+        <div class="options">
+          <label class="opt" id="m2bq2o0" onclick="selectOpt('m2b',2,0,0)"><input type="radio" name="m2bq2"> Son documentos idénticos con nombres diferentes</label>
+          <label class="opt" id="m2bq2o1" onclick="selectOpt('m2b',2,1,0)"><input type="radio" name="m2bq2"> El perfil describe requisitos de la persona; el manual describe las funciones y responsabilidades del cargo</label>
+          <label class="opt" id="m2bq2o2" onclick="selectOpt('m2b',2,2,0)"><input type="radio" name="m2bq2"> El manual de funciones es solo para directivos</label>
+          <label class="opt" id="m2bq2o3" onclick="selectOpt('m2b',2,3,0)"><input type="radio" name="m2bq2"> El perfil de cargo es un requisito de ISO pero no del SOGCS</label>
+        </div>
+        <div class="fb" id="m2bq2fb"></div>
+      </div>
+      <div class="question-block">
+        <div class="q-num">Pregunta 3 de 4</div>
+        <div class="q-text">En el contexto del laboratorio clínico, ¿qué es la gestión por competencias?</div>
+        <div class="options">
+          <label class="opt" id="m2bq3o0" onclick="selectOpt('m2b',3,0,2)"><input type="radio" name="m2bq3"> Evaluar solo el título profesional del trabajador</label>
+          <label class="opt" id="m2bq3o1" onclick="selectOpt('m2b',3,1,2)"><input type="radio" name="m2bq3"> Asignar funciones según la antigüedad</label>
+          <label class="opt" id="m2bq3o2" onclick="selectOpt('m2b',3,2,2)"><input type="radio" name="m2bq3"> Identificar, desarrollar y evaluar el conjunto de conocimientos, habilidades y actitudes requeridos para el desempeño efectivo en cada cargo</label>
+          <label class="opt" id="m2bq3o3" onclick="selectOpt('m2b',3,3,2)"><input type="radio" name="m2bq3"> Aplicar pruebas académicas anuales a todo el personal</label>
+        </div>
+        <div class="fb" id="m2bq3fb"></div>
+      </div>
+      <div class="question-block">
+        <div class="q-num">Pregunta 4 de 4</div>
+        <div class="q-text">¿Cada cuánto tiempo debe evaluarse la competencia del personal en un laboratorio según la NTC-ISO 15189:2022?</div>
+        <div class="options">
+          <label class="opt" id="m2bq4o0" onclick="selectOpt('m2b',4,0,1)"><input type="radio" name="m2bq4"> Solo al momento de la contratación</label>
+          <label class="opt" id="m2bq4o1" onclick="selectOpt('m2b',4,1,1)"><input type="radio" name="m2bq4"> De manera periódica y continua, incluyendo después de capacitaciones o cambios en procedimientos</label>
+          <label class="opt" id="m2bq4o2" onclick="selectOpt('m2b',4,2,1)"><input type="radio" name="m2bq4"> Cada 5 años como mínimo</label>
+          <label class="opt" id="m2bq4o3" onclick="selectOpt('m2b',4,3,1)"><input type="radio" name="m2bq4"> No es obligatorio evaluar la competencia si el personal tiene posgrado</label>
+        </div>
+        <div class="fb" id="m2bq4fb"></div>
+      </div>
+      <button class="reto-submit" onclick="submitReto('m2b',4,[1,1,2,1])">✅ Enviar respuestas</button>
+      <div class="reto-result" id="m2b-result"></div>
+    </div>
+  </div>
+
+  <div class="complete-section">
+    <button class="complete-btn" id="btn-complete-m2" onclick="completeModule('m2','🏗️','Arquitecto Organizacional',50)">
+      ✅ Completar Módulo 2 — Organizar
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     MÓDULO 3 — DIRIGIR
+═══════════════════════════════════════════════════════════════ -->
+<div id="m3" class="mod-panel">
+  <div class="section-block">
+    <h2>🎯 Módulo 3 — Dirección en Salud</h2>
+    <p>La <strong>dirección</strong> es la etapa que pone en marcha lo planeado y organizado. Implica liderazgo, comunicación, motivación y toma de decisiones. El bacteriólogo en roles de gestión debe dirigir equipos interdisciplinarios bajo presión, con recursos limitados y en entornos regulados.</p>
+    <div class="ref-box">
+      <strong>📚 Referencia:</strong> Robbins, S. & Coulter, M. <em>Administración</em> (14.ª ed.). Pearson, 2018. | OPS. <em>Liderazgo en salud pública.</em> Washington: OPS/OMS, 2021. Disponible en: <a href="https://www.paho.org/es/temas/liderazgo-salud" target="_blank">paho.org</a>
+    </div>
+  </div>
+
+  <div class="section-block">
+    <h2>📖 Conceptos fundamentales</h2>
+    <div class="concept-grid">
+      <div class="concept-card" style="background:#EAF6FF;border-color:#0097AA;">
+        <h4>👑 Liderazgo en Salud</h4>
+        <p>Capacidad de influir en el equipo para lograr objetivos institucionales. Estilos: transformacional, situacional, servidor. El bacteriólogo líder genera cultura de calidad.</p>
+      </div>
+      <div class="concept-card" style="background:#E8F8F0;border-color:#27AE60;">
+        <h4>💬 Comunicación Asertiva</h4>
+        <p>Transmisión clara de información técnica y administrativa. Incluye informes de turno, reporte de valores críticos, comunicación con el equipo médico.</p>
+      </div>
+      <div class="concept-card" style="background:#FEF9E7;border-color:#F39C12;">
+        <h4>🔥 Motivación del Equipo</h4>
+        <p>Teorías aplicables: Maslow, Herzberg (factores higiénicos y motivadores), McGregor (Teoría X-Y). En el laboratorio: reconocimiento, participación en decisiones, formación continua.</p>
+      </div>
+      <div class="concept-card" style="background:#F0E6FA;border-color:#6C3483;">
+        <h4>⚡ Toma de Decisiones</h4>
+        <p>Proceso racional ante problemas de calidad, crisis de abastecimiento, resultados críticos o eventos adversos. Metodología: PDCA, ishikawa, 5 porqués.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-block">
+    <h2>🩺 Dirección en el contexto bacteriológico</h2>
+    <ul>
+      <li><strong>Gestión de eventos adversos:</strong> El bacteriólogo director debe aplicar protocolos de notificación de incidentes (SIVIGILA, REPS) y liderar el análisis de causa raíz.</li>
+      <li><strong>Comunicación de resultados críticos:</strong> Protocolo establecido por la NTC-ISO 15189 — notificación inmediata al médico tratante con registro documentado.</li>
+      <li><strong>Gestión del cambio:</strong> Implementación de nuevas tecnologías (automatización, sistemas LIS/HIS), cambios normativos o reorganización estructural.</li>
+      <li><strong>Liderazgo en bioseguridad:</strong> El director técnico es responsable de garantizar el cumplimiento de las medidas de bioseguridad (Resolución 0312/2019, NTC-ISO 15190).</li>
+    </ul>
+  </div>
+
+  <div class="video-wrap">
+    <h3>🎬 Video 1 — Liderazgo transformacional en salud</h3>
+    <div class="video-frame">
+      <iframe id="vid-m3v1" src="about:blank" allowfullscreen title="Liderazgo en salud"></iframe>
+    </div>
+    <div class="video-meta"><span class="vtag">Liderazgo</span><span class="vtag">Gestión de equipos</span><span class="vtag">~10 min</span></div>
+  </div>
+
+  <div class="video-wrap">
+    <h3>🎬 Video 2 — Manejo de conflictos y toma de decisiones en salud</h3>
+    <div class="video-frame">
+      <iframe id="vid-m3v2" src="about:blank" allowfullscreen title="Toma de decisiones salud"></iframe>
+    </div>
+    <div class="video-meta"><span class="vtag">Toma de decisiones</span><span class="vtag">Conflictos laborales</span><span class="vtag">~8 min</span></div>
+  </div>
+
+  <!-- RETO 5 -->
+  <div class="reto-container">
+    <div class="reto-header">
+      <div class="reto-title">⚔️ RETO 5 — Liderazgo y Comunicación</div>
+      <div class="reto-xp">+50 XP</div>
+    </div>
+    <div class="caso-box">
+      <div class="caso-lbl">📋 Caso clínico-administrativo</div>
+      <p>En un laboratorio de hematología, el bacteriólogo coordinador detecta que dos técnicos presentan conflicto abierto que afecta la entrega de resultados. Además, un analizador hematológico emite resultados con variación en el coeficiente de variación del control de calidad interno (>10%), indicando posible desviación del proceso.</p>
+    </div>
+    <div class="timer-lbl" id="t5-lbl">⏱️ Tiempo: 120 seg</div>
+    <div class="timer-bar"><div class="timer-fill" id="t5-fill" style="width:100%"></div></div>
+    <div id="quiz-m3">
+      <div class="question-block">
+        <div class="q-num">Pregunta 1 de 4</div>
+        <div class="q-text">¿Cuál es la primera acción del coordinador ante el conflicto entre el personal técnico?</div>
+        <div class="options">
+          <label class="opt" id="m3q1o0" onclick="selectOpt('m3',1,0,1)"><input type="radio" name="m3q1"> Reportar inmediatamente a Recursos Humanos sin intervenir</label>
+          <label class="opt" id="m3q1o1" onclick="selectOpt('m3',1,1,1)"><input type="radio" name="m3q1"> Reunirse por separado con cada parte para escuchar su perspectiva antes de mediar conjuntamente</label>
+          <label class="opt" id="m3q1o2" onclick="selectOpt('m3',1,2,1)"><input type="radio" name="m3q1"> Ignorar el conflicto mientras no afecte los resultados formalmente</label>
+          <label class="opt" id="m3q1o3" onclick="selectOpt('m3',1,3,1)"><input type="radio" name="m3q1"> Sancionar a ambos inmediatamente por generar clima laboral negativo</label>
+        </div>
+        <div class="fb" id="m3q1fb"></div>
+      </div>
+      <div class="question-block">
+        <div class="q-num">Pregunta 2 de 4</div>
+        <div class="q-text">Ante la desviación del CV en el control de calidad interno, la decisión técnico-administrativa correcta es:</div>
+        <div class="options">
+          <label class="opt" id="m3q2o0" onclick="selectOpt('m3',2,0,2)"><input type="radio" name="m3q2"> Continuar emitiendo resultados y esperar a que se estabilice solo</label>
+          <label class="opt" id="m3q2o1" onclick="selectOpt('m3',2,1,2)"><input type="radio" name="m3q2"> Reportar solo al director sin documentar el evento</label>
+          <label class="opt" id="m3q2o2" onclick="selectOpt('m3',2,2,2)"><input type="radio" name="m3q2"> Bloquear el analizador, no emitir resultados, iniciar análisis de causa raíz (5 porqués / Ishikawa) y documentar el evento de calidad</label>
+          <label class="opt" id="m3q2o3" onclick="selectOpt('m3',2,3,2)"><input type="radio" name="m3q2"> Calibrar el equipo una vez y reiniciar sin investigar la causa</label>
+        </div>
+        <div class="fb" id="m3q2fb"></div>
+      </div>
+      <div class="question-block">
+        <div class="q-num">Pregunta 3 de 4</div>
+        <div class="q-text">¿Qué teoría de motivación sugiere que el reconocimiento y el logro son factores MOTIVADORES (no solo higiénicos) en el equipo de laboratorio?</div>
+        <div class="options">
+          <label class="opt" id="m3q3o0" onclick="selectOpt('m3',3,0,1)"><input type="radio" name="m3q3"> Teoría X de McGregor</label>
+          <label class="opt" id="m3q3o1" onclick="selectOpt('m3',3,1,1)"><input type="radio" name="m3q3"> Teoría bifactorial de Herzberg</label>
+          <label class="opt" id="m3q3o2" onclick="selectOpt('m3',3,2,1)"><input type="radio" name="m3q3"> Teoría de la equidad de Adams</label>
+          <label class="opt" id="m3q3o3" onclick="selectOpt('m3',3,3,1)"><input type="radio" name="m3q3"> Teoría de las necesidades de McClelland</label>
+        </div>
+        <div class="fb" id="m3q3fb"></div>
+      </div>
+      <div class="question-block">
+        <div class="q-num">Pregunta 4 de 4</div>
+        <div class="q-text">El estilo de liderazgo más adecuado para un bacteriólogo que dirige un equipo experto y autónomo en microbiología de alta complejidad es:</div>
+        <div class="options">
+          <label class="opt" id="m3q4o0" onclick="selectOpt('m3',4,0,1)"><input type="radio" name="m3q4"> Autocrático — toma todas las decisiones sin consultar</label>
+          <label class="opt" id="m3q4o1" onclick="selectOpt('m3',4,1,1)"><input type="radio" name="m3q4"> Delegativo (Laissez-faire) — otorga autonomía con supervisión estratégica</label>
+          <label class="opt" id="m3q4o2" onclick="selectOpt('m3',4,2,1)"><input type="radio" name="m3q4"> Burocrático — sigue estrictamente el reglamento sin flexibilidad</label>
+          <label class="opt" id="m3q4o3" onclick="selectOpt('m3',4,3,1)"><input type="radio" name="m3q4"> Paternalista — toma decisiones por el equipo sin consultar su opinión</label>
+        </div>
+        <div class="fb" id="m3q4fb"></div>
+      </div>
+      <button class="reto-submit" onclick="submitReto('m3',4,[1,2,1,1])">✅ Enviar respuestas</button>
+      <div class="reto-result" id="m3-result"></div>
+    </div>
+  </div>
+
+  <!-- RETO 6 -->
+  <div class="reto-container">
+    <div class="reto-header">
+      <div class="reto-title">⚔️ RETO 6 — Gestión del Cambio y Crisis</div>
+      <div class="reto-xp">+50 XP</div>
+    </div>
+    <div class="caso-box">
+      <div class="caso-lbl">📋 Caso clínico-administrativo</div>
+      <p>El laboratorio implementará un nuevo Sistema de Información de Laboratorio (LIS) en 60 días. El 40% del personal mayor de 50 años muestra resistencia activa al cambio. El bacteriólogo director debe liderar la transición garantizando continuidad en la prestación del servicio y manteniendo los indicadores de calidad.</p>
+    </div>
+    <div class="timer-lbl" id="t6-lbl">⏱️ Tiempo: 120 seg</div>
+    <div class="timer-bar"><div class="timer-fill" id="t6-fill" style="width:100%"></div></div>
+    <div id="quiz-m3b">
+      <div class="question-block">
+        <div class="q-num">Pregunta 1 de 4</div>
+        <div class="q-text">¿Cuál es la estrategia más efectiva para reducir la resistencia al cambio tecnológico en el personal?</div>
+        <div class="options">
+          <label class="opt" id="m3bq1o0" onclick="selectOpt('m3b',1,0,1)"><input type="radio" name="m3bq1"> Amenazar con medidas disciplinarias a quienes no adopten el sistema</label>
+          <label class="opt" id="m3bq1o1" onclick="selectOpt('m3b',1,1,1)"><input type="radio" name="m3bq1"> Involucrar al personal en el proceso de implementación, ofrecer capacitación escalonada y comunicar los beneficios concretos del cambio</label>
+          <label class="opt" id="m3bq1o2" onclick="selectOpt('m3b',1,2,1)"><input type="radio" name="m3bq1"> Ignorar la resistencia y continuar con el cronograma sin ajustes</label>
+          <label class="opt" id="m3bq1o3" onclick="selectOpt('m3b',1,3,1)"><input type="radio" name="m3bq1"> Reemplazar al personal resistente antes de la implementación</label>
+        </div>
+        <div class="fb" id="m3bq1fb"></div>
+      </div>
+      <div class="question-block">
+        <div class="q-num">Pregunta 2 de 4</div>
+        <div class="q-text">Un evento adverso en el laboratorio (resultado crítico reportado tardíamente) debe notificarse según:</div>
+        <div class="options">
+          <label class="opt" id="m3bq2o0" onclick="selectOpt('m3b',2,0,1)"><input type="radio" name="m3bq2"> Solo al director técnico en reunión mensual</label>
+          <label class="opt" id="m3bq2o1" onclick="selectOpt('m3b',2,1,1)"><input type="radio" name="m3bq2"> Al sistema de gestión de eventos adversos institucional (PQRS, PAMEC), con análisis de causa raíz y plan de mejora documentado</label>
+          <label class="opt" id="m3bq2o2" onclick="selectOpt('m3b',2,2,1)"><input type="radio" name="m3bq2"> Solo si el paciente fallece como consecuencia directa</label>
+          <label class="opt" id="m3bq2o3" onclick="selectOpt('m3b',2,3,1)"><input type="radio" name="m3bq2"> A la Secretaría de Salud sin previo análisis interno</label>
+        </div>
+        <div class="fb" id="m3bq2fb"></div>
+      </div>
+      <div class="question-block">
+        <div class="q-num">Pregunta 3 de 4</div>
+        <div class="q-text">¿Cuál es el modelo de gestión del cambio más utilizado en organizaciones de salud?</div>
+        <div class="options">
+          <label class="opt" id="m3bq3o0" onclick="selectOpt('m3b',3,0,1)"><input type="radio" name="m3bq3"> Modelo de los 7 hábitos de Covey</label>
+          <label class="opt" id="m3bq3o1" onclick="selectOpt('m3b',3,1,1)"><input type="radio" name="m3bq3"> Modelo de 8 pasos de Kotter: crear urgencia, formar coalición, visión, comunicar, empoderar, logros a corto plazo, consolidar, institucionalizar</label>
+          <label class="opt" id="m3bq3o2" onclick="selectOpt('m3b',3,2,1)"><input type="radio" name="m3bq3"> Teoría Z de Ouchi</label>
+          <label class="opt" id="m3bq3o3" onclick="selectOpt('m3b',3,3,1)"><input type="radio" name="m3bq3"> Modelo de Mintzberg de estructuras organizacionales</label>
+        </div>
+        <div class="fb" id="m3bq3fb"></div>
+      </div>
+      <div class="question-block">
+        <div class="q-num">Pregunta 4 de 4</div>
+        <div class="q-text">¿Cómo debe comunicarse un resultado crítico (ej. potasio 7.2 mEq/L) según la NTC-ISO 15189:2022?</div>
+        <div class="options">
+          <label class="opt" id="m3bq4o0" onclick="selectOpt('m3b',4,0,2)"><input type="radio" name="m3bq4"> Solo por medio escrito en el reporte final del laboratorio</label>
+          <label class="opt" id="m3bq4o1" onclick="selectOpt('m3b',4,1,2)"><input type="radio" name="m3bq4"> Por correo electrónico al médico tratante en las siguientes 24 horas</label>
+          <label class="opt" id="m3bq4o2" onclick="selectOpt('m3b',4,2,2)"><input type="radio" name="m3bq4"> De manera inmediata por vía telefónica al médico responsable, documentando la llamada, quién recibió la información y la hora de la notificación</label>
+          <label class="opt" id="m3bq4o3" onclick="selectOpt('m3b',4,3,2)"><input type="radio" name="m3bq4"> Esperando a que el paciente regrese para informarle directamente</label>
+        </div>
+        <div class="fb" id="m3bq4fb"></div>
+      </div>
+      <button class="reto-submit" onclick="submitReto('m3b',4,[1,1,1,2])">✅ Enviar respuestas</button>
+      <div class="reto-result" id="m3b-result"></div>
+    </div>
+  </div>
+
+  <div class="complete-section">
+    <button class="complete-btn" id="btn-complete-m3" onclick="completeModule('m3','🎯','Director de Equipos',50)">
+      ✅ Completar Módulo 3 — Dirigir
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     MÓDULO 4 — CONTROLAR
+═══════════════════════════════════════════════════════════════ -->
+<div id="m4" class="mod-panel">
+  <div class="section-block">
+    <h2>📊 Módulo 4 — Control en Salud</h2>
+    <p>El <strong>control</strong> cierra el ciclo administrativo. Permite comparar lo ejecutado con lo planeado, identificar desviaciones y aplicar medidas correctivas. En el laboratorio clínico, el control es sinónimo de garantía de calidad: auditorías, indicadores, control estadístico del proceso y mejora continua.</p>
+    <div class="ref-box">
+      <strong>📚 Referencia:</strong> ICONTEC. <em>NTC-ISO 15189:2022 — Laboratorios médicos: Requisitos para calidad y competencia.</em> Bogotá: ICONTEC, 2022. | MinSalud. <em>Guía técnica de buenas prácticas en seguridad del paciente.</em> Bogotá: MSPS, 2015.
+    </div>
+  </div>
+
+  <div class="section-block">
+    <h2>📖 Conceptos fundamentales</h2>
+    <div class="concept-grid">
+      <div class="concept-card" style="background:#EAF6FF;border-color:#0097AA;">
+        <h4>📈 Indicadores de Gestión</h4>
+        <p>Métricas que miden el desempeño. En laboratorio: tiempo de respuesta, % de resultados críticos notificados, tasa de muestras rechazadas, cobertura de exámenes.</p>
+      </div>
+      <div class="concept-card" style="background:#E8F8F0;border-color:#27AE60;">
+        <h4>🔍 Auditoría Interna</h4>
+        <p>Evaluación sistemática del SGC. Revisa procesos, procedimientos y resultados frente a los requisitos de la ISO 15189 y el SOGCS. Genera no conformidades y oportunidades de mejora.</p>
+      </div>
+      <div class="concept-card" style="background:#FEF9E7;border-color:#F39C12;">
+        <h4>📉 Control Estadístico</h4>
+        <p>Reglas de Westgard para control de calidad interno. Cartas de control de Levey-Jennings. Evaluación externa del desempeño (EED) — comparación interlaboratorios.</p>
+      </div>
+      <div class="concept-card" style="background:#F0E6FA;border-color:#6C3483;">
+        <h4>♻️ Mejora Continua</h4>
+        <p>Ciclo PHVA (Planear-Hacer-Verificar-Actuar). Gestión de no conformidades, acciones correctivas y preventivas (CAPA). Revisión por la dirección.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-block">
+    <h2>📐 Indicadores clave del laboratorio clínico (OPS/MinSalud)</h2>
+    <ul>
+      <li><strong>Tiempo de respuesta (TAT):</strong> Tiempo entre recepción de la muestra y entrega del resultado. Meta: hematología urgente &lt;1 hora; rutina &lt;4 horas.</li>
+      <li><strong>Tasa de rechazo de muestras:</strong> % de muestras rechazadas por condiciones inadecuadas. Meta: &lt;2% del total de muestras procesadas.</li>
+      <li><strong>Cobertura de notificación de valores críticos:</strong> % de resultados críticos notificados al médico en tiempo definido. Meta: 100%.</li>
+      <li><strong>Participación en EED:</strong> % de aptitud en evaluación externa del desempeño (interlaboratorio). Meta: &gt;80% de aptitud por analito.</li>
+      <li><strong>No conformidades resueltas:</strong> % de acciones correctivas cerradas en el tiempo establecido. Meta: &gt;90%.</li>
+    </ul>
+    <div class="ref-box">
+      <strong>📌 Fuente:</strong> OPS/OMS. <em>Indicadores de calidad para laboratorios clínicos en América Latina.</em> Washington: OPS, 2019. Disponible en: <a href="https://www.paho.org" target="_blank">paho.org</a>
+    </div>
+  </div>
+
+  <div class="video-wrap">
+    <h3>🎬 Video 1 — Control de calidad en el laboratorio clínico (Reglas de Westgard)</h3>
+    <div class="video-frame">
+      <iframe id="vid-m4v1" src="about:blank" allowfullscreen title="Reglas de Westgard"></iframe>
+    </div>
+    <div class="video-meta"><span class="vtag">Control de calidad</span><span class="vtag">Westgard</span><span class="vtag">~12 min</span></div>
+  </div>
+
+  <div class="video-wrap">
+    <h3>🎬 Video 2 — Auditoría interna y mejora continua ISO 15189</h3>
+    <div class="video-frame">
+      <iframe id="vid-m4v2" src="about:blank" allowfullscreen title="Auditoría ISO 15189"></iframe>
+    </div>
+    <div class="video-meta"><span class="vtag">Auditoría</span><span class="vtag">ISO 15189</span><span class="vtag">Mejora continua</span><span class="vtag">~10 min</span></div>
+  </div>
+
+  <!-- RETO 7 -->
+  <div class="reto-container">
+    <div class="reto-header">
+      <div class="reto-title">⚔️ RETO 7 — Indicadores y Control de Calidad</div>
+      <div class="reto-xp">+50 XP</div>
+    </div>
+    <div class="caso-box">
+      <div class="caso-lbl">📋 Caso clínico-administrativo</div>
+      <p>El laboratorio de urgencias del Hospital Universitario reporta en el mes de marzo: TAT promedio de glucosa urgente = 2.8 horas (meta &lt;1h), tasa de rechazo de muestras = 4.2% (meta &lt;2%), y cobertura de valores críticos notificados = 78% (meta 100%). El bacteriólogo coordinador debe priorizar las acciones de mejora.</p>
+    </div>
+    <div class="timer-lbl" id="t7-lbl">⏱️ Tiempo: 120 seg</div>
+    <div class="timer-bar"><div class="timer-fill" id="t7-fill" style="width:100%"></div></div>
+    <div id="quiz-m4">
+      <div class="question-block">
+        <div class="q-num">Pregunta 1 de 4</div>
+        <div class="q-text">¿Cuál de los tres indicadores debe priorizarse primero por su impacto en la seguridad del paciente?</div>
+        <div class="options">
+          <label class="opt" id="m4q1o0" onclick="selectOpt('m4',1,0,2)"><input type="radio" name="m4q1"> TAT de glucosa urgente (2.8 horas)</label>
+          <label class="opt" id="m4q1o1" onclick="selectOpt('m4',1,1,2)"><input type="radio" name="m4q1"> Tasa de rechazo de muestras (4.2%)</label>
+          <label class="opt" id="m4q1o2" onclick="selectOpt('m4',1,2,2)"><input type="radio" name="m4q1"> Cobertura de notificación de valores críticos (78%) — riesgo vital inmediato</label>
+          <label class="opt" id="m4q1o3" onclick="selectOpt('m4',1,3,2)"><input type="radio" name="m4q1"> Los tres tienen igual prioridad y deben abordarse simultáneamente</label>
+        </div>
+        <div class="fb" id="m4q1fb"></div>
+      </div>
+      <div class="question-block">
+        <div class="q-num">Pregunta 2 de 4</div>
+        <div class="q-text">¿Qué herramienta estadística se usa para detectar tendencias en el control de calidad interno del laboratorio?</div>
+        <div class="options">
+          <label class="opt" id="m4q2o0" onclick="selectOpt('m4',2,0,1)"><input type="radio" name="m4q2"> Diagrama de Pareto</label>
+          <label class="opt" id="m4q2o1" onclick="selectOpt('m4',2,1,1)"><input type="radio" name="m4q2"> Carta de control de Levey-Jennings con reglas de Westgard</label>
+          <label class="opt" id="m4q2o2" onclick="selectOpt('m4',2,2,1)"><input type="radio" name="m4q2"> Matriz de riesgos AMFE</label>
+          <label class="opt" id="m4q2o3" onclick="selectOpt('m4',2,3,1)"><input type="radio" name="m4q2"> Diagrama de Gantt</label>
+        </div>
+        <div class="fb" id="m4q2fb"></div>
+      </div>
+      <div class="question-block">
+        <div class="q-num">Pregunta 3 de 4</div>
+        <div class="q-text">Una no conformidad detectada en auditoría interna requiere:</div>
+        <div class="options">
+          <label class="opt" id="m4q3o0" onclick="selectOpt('m4',3,0,1)"><input type="radio" name="m4q3"> Solo documentarla en el informe sin acciones adicionales</label>
+          <label class="opt" id="m4q3o1" onclick="selectOpt('m4',3,1,1)"><input type="radio" name="m4q3"> Análisis de causa raíz, acción correctiva documentada, seguimiento del cierre y verificación de efectividad</label>
+          <label class="opt" id="m4q3o2" onclick="selectOpt('m4',3,2,1)"><input type="radio" name="m4q3"> Notificación a la Superintendencia de Salud de forma inmediata</label>
+          <label class="opt" id="m4q3o3" onclick="selectOpt('m4',3,3,1)"><input type="radio" name="m4q3"> Suspender temporalmente el proceso hasta nueva auditoría</label>
+        </div>
+        <div class="fb" id="m4q3fb"></div>
+      </div>
+      <div class="question-block">
+        <div class="q-num">Pregunta 4 de 4</div>
+        <div class="q-text">El PAMEC (Programa de Auditoría para el Mejoramiento de la Calidad) es un componente del SOGCS que obliga a las IPS a:</div>
+        <div class="options">
+          <label class="opt" id="m4q4o0" onclick="selectOpt('m4',4,0,0)"><input type="radio" name="m4q4"> Implementar solo indicadores financieros</label>
+          <label class="opt" id="m4q4o1" onclick="selectOpt('m4',4,1,0)"><input type="radio" name="m4q4"> Autoevaluar sus procesos, identificar brechas de calidad y ejecutar planes de mejora con seguimiento continuo</label>
+          <label class="opt" id="m4q4o2" onclick="selectOpt('m4',4,2,0)"><input type="radio" name="m4q4"> Contratar auditores externos anuales sin proceso interno</label>
+          <label class="opt" id="m4q4o3" onclick="selectOpt('m4',4,3,0)"><input type="radio" name="m4q4"> Reportar resultados al DANE cada semestre</label>
+        </div>
+        <div class="fb" id="m4q4fb"></div>
+      </div>
+      <button class="reto-submit" onclick="submitReto('m4',4,[2,1,1,1])">✅ Enviar respuestas</button>
+      <div class="reto-result" id="m4-result"></div>
+    </div>
+  </div>
+
+  <!-- RETO 8 -->
+  <div class="reto-container">
+    <div class="reto-header">
+      <div class="reto-title">⚔️ RETO 8 — Auditoría y Mejora Continua</div>
+      <div class="reto-xp">+50 XP</div>
+    </div>
+    <div class="caso-box">
+      <div class="caso-lbl">📋 Caso clínico-administrativo</div>
+      <p>El laboratorio de microbiología se prepara para la visita de acreditación del ICONTEC bajo NTC-ISO 15189:2022. El equipo auditor detecta: ausencia de registros de calibración de balanzas analíticas (últimos 8 meses), validación incompleta del método de PCR para COVID-19 y falta de evaluación de competencias del 30% del personal.</p>
+    </div>
+    <div class="timer-lbl" id="t8-lbl">⏱️ Tiempo: 120 seg</div>
+    <div class="timer-bar"><div class="timer-fill" id="t8-fill" style="width:100%"></div></div>
+    <div id="quiz-m4b">
+      <div class="question-block">
+        <div class="q-num">Pregunta 1 de 4</div>
+        <div class="q-text">¿Cuál de las tres no conformidades representa mayor riesgo clínico INMEDIATO para los pacientes?</div>
+        <div class="options">
+          <label class="opt" id="m4bq1o0" onclick="selectOpt('m4b',1,0,1)"><input type="radio" name="m4bq1"> Ausencia de registros de calibración de balanzas</label>
+          <label class="opt" id="m4bq1o1" onclick="selectOpt('m4b',1,1,1)"><input type="radio" name="m4bq1"> Validación incompleta del método de PCR — los resultados podrían ser erróneos y afectar decisiones clínicas en curso</label>
+          <label class="opt" id="m4bq1o2" onclick="selectOpt('m4b',1,2,1)"><input type="radio" name="m4bq1"> Falta de evaluación de competencias del personal</label>
+          <label class="opt" id="m4bq1o3" onclick="selectOpt('m4b',1,3,1)"><input type="radio" name="m4bq1"> Las tres tienen igual nivel de riesgo clínico</label>
+        </div>
+        <div class="fb" id="m4bq1fb"></div>
+      </div>
+      <div class="question-block">
+        <div class="q-num">Pregunta 2 de 4</div>
+        <div class="q-text">La validación de métodos en el laboratorio clínico según la ISO 15189 implica verificar:</div>
+        <div class="options">
+          <label class="opt" id="m4bq2o0" onclick="selectOpt('m4b',2,0,0)"><input type="radio" name="m4bq2"> Solo la sensibilidad del método</label>
+          <label class="opt" id="m4bq2o1" onclick="selectOpt('m4b',2,1,0)"><input type="radio" name="m4bq2"> Precisión, exactitud, especificidad, sensibilidad, linealidad, rango de medición e interferencias</label>
+          <label class="opt" id="m4bq2o2" onclick="selectOpt('m4b',2,2,0)"><input type="radio" name="m4bq2"> Solo que el fabricante del kit lo certifique</label>
+          <label class="opt" id="m4bq2o3" onclick="selectOpt('m4b',2,3,0)"><input type="radio" name="m4bq2"> Únicamente la comparación con otro laboratorio de referencia</label>
+        </div>
+        <div class="fb" id="m4bq2fb"></div>
+      </div>
+      <div class="question-block">
+        <div class="q-num">Pregunta 3 de 4</div>
+        <div class="q-text">En el ciclo PHVA aplicado a la no conformidad de calibración, ¿qué corresponde a la fase "ACTUAR"?</div>
+        <div class="options">
+          <label class="opt" id="m4bq3o0" onclick="selectOpt('m4b',3,0,2)"><input type="radio" name="m4bq3"> Identificar que los registros estaban ausentes (diagnóstico)</label>
+          <label class="opt" id="m4bq3o1" onclick="selectOpt('m4b',3,1,2)"><input type="radio" name="m4bq3"> Ejecutar la calibración de las balanzas pendientes</label>
+          <label class="opt" id="m4bq3o2" onclick="selectOpt('m4b',3,2,2)"><input type="radio" name="m4bq3"> Estandarizar el procedimiento de calibración como práctica permanente y revisar en auditoría siguiente</label>
+          <label class="opt" id="m4bq3o3" onclick="selectOpt('m4b',3,3,2)"><input type="radio" name="m4bq3"> Verificar que la calibración se ejecutó correctamente</label>
+        </div>
+        <div class="fb" id="m4bq3fb"></div>
+      </div>
+      <div class="question-block">
+        <div class="q-num">Pregunta 4 de 4</div>
+        <div class="q-text">¿Qué es la Evaluación Externa del Desempeño (EED) en laboratorio clínico?</div>
+        <div class="options">
+          <label class="opt" id="m4bq4o0" onclick="selectOpt('m4b',4,0,1)"><input type="radio" name="m4bq4"> La evaluación de desempeño laboral anual del bacteriólogo</label>
+          <label class="opt" id="m4bq4o1" onclick="selectOpt('m4b',4,1,1)"><input type="radio" name="m4bq4"> Programa de comparación interlaboratorios donde se envían muestras desconocidas para verificar la exactitud y reproducibilidad de los resultados frente a valores de referencia</label>
+          <label class="opt" id="m4bq4o2" onclick="selectOpt('m4b',4,2,1)"><input type="radio" name="m4bq4"> Auditoría realizada por la Superintendencia de Salud</label>
+          <label class="opt" id="m4bq4o3" onclick="selectOpt('m4b',4,3,1)"><input type="radio" name="m4bq4"> La certificación ISO realizada por el ICONTEC</label>
+        </div>
+        <div class="fb" id="m4bq4fb"></div>
+      </div>
+      <button class="reto-submit" onclick="submitReto('m4b',4,[1,1,2,1])">✅ Enviar respuestas</button>
+      <div class="reto-result" id="m4b-result"></div>
+    </div>
+  </div>
+
+  <div class="complete-section">
+    <button class="complete-btn" id="btn-complete-m4" onclick="completeModule('m4','📊','Experto en Calidad',50)">
+      ✅ Completar Módulo 4 — Controlar
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PANEL DE LOGROS
+═══════════════════════════════════════════════════════════════ -->
+<div id="logros" class="mod-panel">
+  <div class="logros-panel">
+    <h2>🏆 Mis Logros — AdminLab</h2>
+    <div id="logros-list">
+      <div class="logro-row locked" id="logro-m1">
+        <div class="logro-ico">🗺️</div>
+        <div class="logro-info">
+          <h4>Planificador Estratégico</h4>
+          <p>Completaste el Módulo 1 — Planeación en Salud</p>
+        </div>
+        <div class="logro-pts">+50 XP</div>
+      </div>
+      <div class="logro-row locked" id="logro-m2">
+        <div class="logro-ico">🏗️</div>
+        <div class="logro-info">
+          <h4>Arquitecto Organizacional</h4>
+          <p>Completaste el Módulo 2 — Organización en Salud</p>
+        </div>
+        <div class="logro-pts">+50 XP</div>
+      </div>
+      <div class="logro-row locked" id="logro-m3">
+        <div class="logro-ico">🎯</div>
+        <div class="logro-info">
+          <h4>Director de Equipos</h4>
+          <p>Completaste el Módulo 3 — Dirección en Salud</p>
+        </div>
+        <div class="logro-pts">+50 XP</div>
+      </div>
+      <div class="logro-row locked" id="logro-m4">
+        <div class="logro-ico">📊</div>
+        <div class="logro-info">
+          <h4>Experto en Calidad</h4>
+          <p>Completaste el Módulo 4 — Control en Salud</p>
+        </div>
+        <div class="logro-pts">+50 XP</div>
+      </div>
+      <div class="logro-row locked" id="logro-master">
+        <div class="logro-ico">🥇</div>
+        <div class="logro-info">
+          <h4>Bacteriólogo Administrador</h4>
+          <p>Completaste los 4 módulos del proceso administrativo</p>
+        </div>
+        <div class="logro-pts">+200 XP</div>
+      </div>
+      <div class="logro-row locked" id="logro-perfect">
+        <div class="logro-ico">⭐</div>
+        <div class="logro-info">
+          <h4>Puntaje Perfecto</h4>
+          <p>Obtuviste 100% en al menos un reto</p>
+        </div>
+        <div class="logro-pts">+100 XP</div>
+      </div>
+      <div class="logro-row locked" id="logro-speed">
+        <div class="logro-ico">⚡</div>
+        <div class="logro-info">
+          <h4>Respuesta Rápida</h4>
+          <p>Completaste un reto con más de 60 segundos restantes</p>
+        </div>
+        <div class="logro-pts">+50 XP</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-block" style="margin-top:20px;">
+    <h2>🎓 Mis Insignias</h2>
+    <div class="insignias-grid" id="insignias-grid">
+      <div class="insignia-card insignia-locked" id="ins-m1">
+        <div class="insignia-icon">🗺️</div>
+        <h3>Planificador</h3>
+        <p>Módulo 1 completado</p>
+      </div>
+      <div class="insignia-card insignia-locked" id="ins-m2">
+        <div class="insignia-icon">🏗️</div>
+        <h3>Organizador</h3>
+        <p>Módulo 2 completado</p>
+      </div>
+      <div class="insignia-card insignia-locked" id="ins-m3">
+        <div class="insignia-icon">🎯</div>
+        <h3>Director</h3>
+        <p>Módulo 3 completado</p>
+      </div>
+      <div class="insignia-card insignia-locked" id="ins-m4">
+        <div class="insignia-icon">📊</div>
+        <h3>Controlador</h3>
+        <p>Módulo 4 completado</p>
+      </div>
+      <div class="insignia-card insignia-locked" id="ins-master">
+        <div class="insignia-icon">🥇</div>
+        <h3>Bacteriólogo Administrador</h3>
+        <p>¡Curso completo!</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<!-- Notificación -->
+<div class="notif" id="notif">
+  <span class="n-ico" id="notif-ico">🎉</span>
+  <span id="notif-msg">¡Logro desbloqueado!</span>
+</div>
+
+<script>
+// ── Estado global ────────────────────────────────────────────────────────────
+const state = {
+  xp: 0, modulesCompleted: [], retosCompleted: {},
+  timers: {}, answers: {}, speedBonus: false, perfectBonus: false
+};
+
+// ── Navegación ───────────────────────────────────────────────────────────────
+function switchMod(id, btn) {
+  document.querySelectorAll('.mod-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.mod-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(btn) btn.classList.add('active');
+}
+
+function tryMod(id, btn) {
+  const order = ['m1','m2','m3','m4'];
+  const idx = order.indexOf(id);
+  if(idx > 0 && !state.modulesCompleted.includes(order[idx-1])) {
+    notify('🔒','Completa el módulo anterior primero');
+    return;
+  }
+  switchMod(id, btn);
+}
+
+// ── Selección de opciones ────────────────────────────────────────────────────
+function selectOpt(qid, qnum, optIdx, correctIdx) {
+  if(!state.answers[qid]) state.answers[qid] = {};
+  if(state.answers[qid][qnum] !== undefined) return;
+  state.answers[qid][qnum] = optIdx;
+}
+
+// ── Timers ───────────────────────────────────────────────────────────────────
+const timerMap = {
+  'm1':'t1','m1b':'t2','m2':'t3','m2b':'t4',
+  'm3':'t5','m3b':'t6','m4':'t7','m4b':'t8'
+};
+let activeTimers = {};
+
+function startTimer(qid, secs) {
+  if(activeTimers[qid]) return;
+  const fillEl = document.getElementById(timerMap[qid]+'-fill');
+  const lblEl  = document.getElementById(timerMap[qid]+'-lbl');
+  let remaining = secs;
+  activeTimers[qid] = setInterval(()=>{
+    remaining--;
+    const pct = (remaining/secs)*100;
+    if(fillEl) fillEl.style.width = pct+'%';
+    if(fillEl) fillEl.style.background = pct>50?'linear-gradient(90deg,#27AE60,#00B4C8)':
+      pct>20?'linear-gradient(90deg,#F39C12,#F5A623)':'linear-gradient(90deg,#E74C3C,#C0392B)';
+    if(lblEl) lblEl.textContent = `⏱️ Tiempo: ${remaining} seg`;
+    if(remaining <= 0) {
+      clearInterval(activeTimers[qid]);
+      if(lblEl) lblEl.textContent = '⏱️ ¡Tiempo agotado!';
+    }
+    state.timers[qid] = remaining;
+  }, 1000);
+}
+
+// ── Submit Reto ───────────────────────────────────────────────────────────────
+function submitReto(qid, total, corrects) {
+  if(state.retosCompleted[qid]) { notify('✅','Ya completaste este reto'); return; }
+
+  // Iniciar timer si no ha iniciado
+  startTimer(qid, 120);
+
+  let score = 0;
+  for(let i=1; i<=total; i++) {
+    const ans = state.answers[qid] ? state.answers[qid][i] : undefined;
+    const correct = corrects[i-1];
+    const fbEl = document.getElementById(qid+'q'+i+'fb') ||
+                 document.getElementById(qid.replace('b','')+'q'+i+'fb');
+
+    // Para retros "b" el ID es m1bq1fb
+    const fbEl2 = document.getElementById(qid+'q'+i+'fb');
+
+    if(ans === correct) {
+      score++;
+      const optEl = document.getElementById(qid+'q'+i+'o'+ans) ||
+                    document.getElementById(qid+'q'+i+'o'+ans);
+      if(optEl) optEl.classList.add('correct');
+      if(fbEl2) { fbEl2.classList.add('show','correct'); fbEl2.textContent='✅ ¡Correcto! Excelente análisis.'; }
+    } else {
+      if(ans !== undefined) {
+        const wrongEl = document.getElementById(qid+'q'+i+'o'+ans);
+        if(wrongEl) wrongEl.classList.add('wrong');
+      }
+      const corrEl = document.getElementById(qid+'q'+i+'o'+correct);
+      if(corrEl) corrEl.classList.add('correct');
+      if(fbEl2) { fbEl2.classList.add('show','wrong'); fbEl2.textContent='❌ Revisa la respuesta correcta resaltada en verde.'; }
+    }
+  }
+
+  const pct = Math.round((score/total)*100);
+  const xpEarned = Math.round((pct/100)*50);
+  addXP(xpEarned);
+  state.retosCompleted[qid] = { score: pct, xp: xpEarned };
+
+  // Logro velocidad
+  const timeLeft = state.timers[qid] !== undefined ? state.timers[qid] : 120;
+  if(timeLeft > 60 && !state.speedBonus) {
+    state.speedBonus = true;
+    addXP(50);
+    unlockLogro('logro-speed');
+    setTimeout(()=>notify('⚡','¡Respuesta Rápida! +50 XP extra'), 1000);
+  }
+
+  // Logro perfecto
+  if(pct === 100 && !state.perfectBonus) {
+    state.perfectBonus = true;
+    addXP(100);
+    unlockLogro('logro-perfect');
+    setTimeout(()=>notify('⭐','¡Puntaje Perfecto! +100 XP'), 1200);
+  }
+
+  // Mostrar resultado
+  const resEl = document.getElementById(qid+'-result');
+  if(resEl) {
+    resEl.innerHTML = `
+      <div class="big-score">${pct}%</div>
+      <p>${pct>=80?'🎉 ¡Excelente! Dominas este contenido.':pct>=60?'👍 Buen trabajo. Repasa lo que falló.':'📚 Revisa el material y vuelve a intentarlo.'}</p>
+      <div class="xp-earned">+${xpEarned} XP ganados</div>`;
+    resEl.classList.add('show');
+  }
+
+  if(activeTimers[qid]) { clearInterval(activeTimers[qid]); }
+}
+
+// ── Completar módulo ──────────────────────────────────────────────────────────
+function completeModule(mod, ico, nombre, xpBonus) {
+  if(state.modulesCompleted.includes(mod)) return;
+  state.modulesCompleted.push(mod);
+  addXP(xpBonus);
+
+  // Desbloquear insignia y logro
+  unlockInsignia('ins-'+mod);
+  unlockLogro('logro-'+mod);
+  notify(ico, `¡Módulo completado! Insignia "${nombre}" desbloqueada`);
+
+  // Marcar botón módulo
+  const btn = document.querySelector(`[data-mod="${mod}"]`);
+  if(btn) {
+    const existing = btn.querySelector('.badge-done');
+    if(!existing) btn.insertAdjacentHTML('beforeend','<span class="badge-done">✓</span>');
+  }
+
+  // Desbloquear siguiente módulo
+  const order = ['m1','m2','m3','m4'];
+  const idx = order.indexOf(mod);
+  if(idx < 3) {
+    const nextBtn = document.getElementById('btn-'+order[idx+1]);
+    if(nextBtn) nextBtn.classList.remove('locked');
+  }
+
+  // Deshabilitar botón
+  const completBtn = document.getElementById('btn-complete-'+mod);
+  if(completBtn) { completBtn.disabled=true; completBtn.textContent='✅ Módulo completado'; }
+
+  // Actualizar progreso
+  updateProgress();
+
+  // Verificar si todos completados
+  if(state.modulesCompleted.length === 4) {
+    addXP(200);
+    unlockInsignia('ins-master');
+    unlockLogro('logro-master');
+    setTimeout(()=>notify('🥇','¡BACTERIÓLOGO ADMINISTRADOR! Curso completo +200 XP'), 1500);
+  }
+}
+
+// ── XP y progreso ─────────────────────────────────────────────────────────────
+function addXP(amount) {
+  state.xp += amount;
+  document.getElementById('xp-total').textContent = state.xp;
+  // Animación
+  const badge = document.querySelector('.xp-badge');
+  badge.style.transform='scale(1.3)';
+  setTimeout(()=>badge.style.transform='scale(1)',300);
+}
+
+function updateProgress() {
+  const pct = (state.modulesCompleted.length/4)*100;
+  document.getElementById('prog-fill').style.width = pct+'%';
+  document.getElementById('prog-lbl').textContent = `${state.modulesCompleted.length} / 4 módulos`;
+}
+
+// ── Insignias y logros ────────────────────────────────────────────────────────
+function unlockInsignia(id) {
+  const el = document.getElementById(id);
+  if(el) { el.classList.remove('insignia-locked'); el.style.borderTopColor='var(--yellow)'; }
+}
+function unlockLogro(id) {
+  const el = document.getElementById(id);
+  if(el) el.classList.remove('locked');
+}
+
+// ── Notificación toast ────────────────────────────────────────────────────────
+let notifTimeout;
+function notify(ico, msg) {
+  const el = document.getElementById('notif');
+  document.getElementById('notif-ico').textContent = ico;
+  document.getElementById('notif-msg').textContent = msg;
+  el.classList.add('show');
+  clearTimeout(notifTimeout);
+  notifTimeout = setTimeout(()=>el.classList.remove('show'), 3500);
+}
+
+// Iniciar timers al hacer scroll a los retos
+const timerStarted = {};
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting) {
+      const tid = e.target.dataset.timer;
+      if(tid && !timerStarted[tid]) { timerStarted[tid]=true; startTimer(tid,120); }
+    }
+  });
+}, { threshold:0.3 });
+
+document.querySelectorAll('.reto-container').forEach((el,i)=>{
+  const ids = Object.keys(timerMap);
+  el.dataset.timer = ids[i];
+  observer.observe(el);
+});
+</script>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// CONFIGURACIÓN DE VIDEOS — Cambia los IDs aquí
+// Para obtener el ID de un video de YouTube:
+// Abre el video → copia el código después de ?v=
+// Ejemplo: youtube.com/watch?v=ABC123 → ID es ABC123
+// ═══════════════════════════════════════════════════════
+const VIDEOS = {
+  m1v1: { id: "Yp9QNYZ62-I", titulo: "Planeación estratégica en salud" },
+  m1v2: { id: "o_gCpFAz3TU", titulo: "Matriz DOFA aplicada a salud" },
+  m2v1: { id: "DcfW5TzRlqQ", titulo: "Estructura organizacional en salud" },
+  m2v2: { id: "VjORGHdEjy8", titulo: "Mapa de procesos ISO 15189" },
+  m3v1: { id: "T8JBKF4NUIM", titulo: "Liderazgo transformacional en salud" },
+  m3v2: { id: "J1HMO5MBjCU", titulo: "Toma de decisiones gerenciales" },
+  m4v1: { id: "LkdjC3M8oLQ", titulo: "Control de calidad laboratorio clínico" },
+  m4v2: { id: "XY3Kw1bqMVo", titulo: "Auditoría interna y mejora continua" },
+};
+
+// Cargar videos dinámicamente al iniciar
+document.addEventListener("DOMContentLoaded", function() {
+  Object.entries(VIDEOS).forEach(([key, v]) => {
+    const el = document.getElementById("vid-" + key);
+    if(el) el.src = "https://www.youtube.com/embed/" + v.id + "?rel=0";
+  });
+});
+</script>
+
+</body>
+</html>
